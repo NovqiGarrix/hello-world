@@ -5,13 +5,20 @@ import { scheduleJob } from "node-schedule";
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const NVDRIVE_SERVICE_ENDPOINT = process.env.NVDRIVE_SERVICE_ENDPOINT!;
 
-  scheduleJob("*/30 * * * *", async () => {
+  async function updateToken() {
     const resp = await fetch(
       `${NVDRIVE_SERVICE_ENDPOINT}/api/v1/access_token`,
-      { method: "POST", keepalive: true }
+      {
+        method: "POST",
+        keepalive: true,
+      }
     );
+
     console.log(resp.status);
-  });
+  }
+
+  await updateToken();
+  scheduleJob("*/30 * * * *", updateToken);
 
   return {
     props: {
